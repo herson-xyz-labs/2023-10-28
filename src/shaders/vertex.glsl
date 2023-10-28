@@ -6,9 +6,10 @@ uniform float uTime;
 
 attribute vec3 position;
 attribute vec2 uv;
+attribute vec3 normal;
 
 varying vec2 vUv;
-varying float vElevation;
+varying vec3 vNormal;
 
 void main() {
 
@@ -25,5 +26,5 @@ void main() {
     gl_Position = projectionPosition;
 
     vUv = uv;
-    vElevation = elevation;
+    vNormal = (modelMatrix * vec4(normal, 0.0)).xyz; // We're transforming the normal from local space to world space
 }

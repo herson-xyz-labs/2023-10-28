@@ -34,5 +34,7 @@ void main() {
 
     vec3  color        = textureColor.rgb + lighting;
 
+    color = textureColor.rgb;
+
     gl_FragColor       = vec4(color, 1.0);
 }

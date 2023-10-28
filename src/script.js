@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
 import vertexShader from './shaders/vertex.glsl'
 import fragmentShader from './shaders/fragment.glsl'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 /**
  * Base
@@ -49,6 +50,23 @@ const material = new THREE.RawShaderMaterial({
         uTexture: { value: linesTexture }
     }
 })
+
+const loader = new GLTFLoader();
+loader.setPath( '/models/' );
+loader.load( 'blender-export.glb', function ( ship ) 
+    {
+        ship.scene.traverse( function ( ship ) 
+            {
+                ship.material = material;
+            }
+        );
+
+        console.log(ship);
+
+        scene.add( ship.scene );
+
+    }
+);
 
 gui.add(material.uniforms.uFrequency.value, 'x').min(0).max(20).step(0.01).name('frequencyX')
 gui.add(material.uniforms.uFrequency.value, 'y').min(0).max(20).step(0.01).name('frequencyY')

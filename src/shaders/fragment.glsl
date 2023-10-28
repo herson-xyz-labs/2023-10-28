@@ -8,6 +8,14 @@ varying float vElevation;
 
 void main() {
     vec4 textureColor = texture2D(uTexture, fract(vUv * 10.0));
-    textureColor.rgb *= vElevation * 2.0 + 0.5;
-    gl_FragColor = textureColor;
+
+    vec3 lighting = vec3(0.0);
+
+    vec3 ambientLight = vec3(0.5); // Not from any particular direction, just ambient lighting
+
+    lighting += ambientLight;      // Lighting is the sum of all the light contributions
+
+    vec3 color = textureColor.rgb + lighting;
+
+    gl_FragColor = vec4(color, 1.0);
 }

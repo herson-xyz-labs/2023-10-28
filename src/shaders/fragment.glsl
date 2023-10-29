@@ -22,17 +22,27 @@ void main() {
     vec3 normal        = normalize(vNormal);
 
     
-    // Hemisphere lighting
-    vec3  skyLight     = vec3(0.0, 0.3, 0.6);                   // From above 
-    vec3  groundLight  = vec3(0.6, 0.3, 0.1);                   // From below
-    float hemiMix      = remap(normal.y, -1.0, 1.0, 0.0, 1.0);  // Remap the normal to a value between 0 and 1
-    vec3  hemiLight    = mix(groundLight, skyLight, hemiMix);   // Mix the ground and sky light based on the normal
+    vec3  skyLight     = vec3(1.0, 0.3, 0.6);                   
+    vec3  groundLight  = vec3(0.6, 0.3, 0.1);                   
+    float hemiMix      = remap(normal.y, -1.0, 1.0, 0.0, 1.0);  
+    vec3  hemiLight    = mix(groundLight, skyLight, hemiMix);   
 
-    vec3  ambientLight = vec3(0.5);                             // Not from any particular direction, just ambient lighting
+    vec3  ambientLight = vec3(0.5);
 
-    lighting += ambientLight * 0.0 + hemiLight;                 // Lighting is the sum of all the light contributions
+    /* 
+        Lambertian Lighting Model
+        - Figure out the direction of the light source to this pixel
+        - Use the dot product between the normal and the light direcion to figure out how much light is hitting this pixel
+    */                             
 
-    vec3  color        = textureColor.rgb + lighting;
+    vec3  lightDirection = normalize(vec3(1.0, 1.0, 1.0));
+    float dp             = max(dot(normal, lightDirection), 0.0);
+    vec3  sunlightColor  = vec3(1.0, 1.0, 0.9);
+    vec3  sunlight       = sunlightColor * dp;
 
-    gl_FragColor       = vec4(color, 1.0);
+    lighting += ambientLight * 0.0 + hemiLight * 0.5 + sunlight * 0.5;                 
+
+    vec3  color          = textureColor.rgb + lighting;
+
+    gl_FragColor         = vec4(color, 1.0);
 }

@@ -26,7 +26,7 @@ const linesTexture = textureLoader.load('/textures/lines.png')
  * Test mesh
  */
 // Geometry
-const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
+const geometry = new THREE.TorusKnotGeometry(0.3, 0.1, 64, 16) // 33 * 33 = 1089
 const count = geometry.attributes.position.count    // 33 * 33 = 1089
 const randoms = new Float32Array(count)            // 1089
 

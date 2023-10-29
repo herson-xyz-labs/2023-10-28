@@ -19,12 +19,12 @@ const scene = new THREE.Scene()
 // Cubemap
 const cubeTextureLoader = new THREE.CubeTextureLoader()
 const texture = cubeTextureLoader.load([
-    '/cubemap/px.png',
-    '/cubemap/nx.png',
-    '/cubemap/py.png',
-    '/cubemap/ny.png',
-    '/cubemap/pz.png',
-    '/cubemap/nz.png'
+    './cubemap/px.png',
+    './cubemap/nx.png',
+    './cubemap/py.png',
+    './cubemap/ny.png',
+    './cubemap/pz.png',
+    './cubemap/nz.png'
 ])
 
 scene.background = texture

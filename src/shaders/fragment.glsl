@@ -2,11 +2,11 @@ precision mediump float;
 
 uniform sampler2D uTexture;
 uniform samplerCube specMap;
+uniform vec3 cameraPosition;
 
 varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vPosition;
-varying vec3 vCameraPosition;
 
 float inverseLerp(float v, float minValue, float maxValue) {
   return (v - minValue) / (maxValue - minValue);
@@ -33,7 +33,7 @@ void main() {
     vec3 lighting      = vec3(0.0);
     vec3 normal        = normalize(vNormal);
 
-    vec3 viewDirection = normalize(vCameraPosition - vPosition);
+    vec3 viewDirection = normalize(cameraPosition - vPosition);
 
     vec3  ambientLight = vec3(0.5);                       
 

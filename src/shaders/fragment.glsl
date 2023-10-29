@@ -54,18 +54,21 @@ void main() {
 
     vec3 specular = vec3(phongValue);
 
-    /*  
-        - We need to reflect around the normal
-        - We call reflect on the negative view direction and the normal, then normalize the result
-        - Sample from the cubemap
-    */
-
-    // IBL Specular
     vec3 iblCoord = normalize(reflect(-viewDirection, normal));
     vec3 iblSample = textureCube(specMap, iblCoord).rgb;
 
     specular += iblSample * 0.5;
 
+    /*  
+        - Take the dot product of the view direction and the normal
+    */
+
+    // Fresnel
+    float fresnel = 1.0 - max(0.0, dot(viewDirection, normal));
+    fresnel = pow(fresnel, 2.0);
+
+    specular *= fresnel;
+    
     lighting += ambientLight * 0.0 + hemiLight * 0.5 + sunlight * 0.5;                 
 
     vec3  color          = textureColor.rgb * 0.2 + lighting + specular;   

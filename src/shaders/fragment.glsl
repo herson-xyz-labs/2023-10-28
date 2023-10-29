@@ -3,8 +3,11 @@ precision mediump float;
 uniform vec3 uColor;
 uniform sampler2D uTexture;
 
+uniform vec3 uCameraPosition;
+
 varying vec2 vUv;
 varying vec3 vNormal;
+varying vec3 vPosition;
 
 float inverseLerp(float v, float minValue, float maxValue) {
   return (v - minValue) / (maxValue - minValue);
@@ -31,28 +34,37 @@ void main() {
     vec3 lighting      = vec3(0.0);
     vec3 normal        = normalize(vNormal);
 
-    
-    vec3  skyLight     = vec3(1.0, 0.3, 0.6);                   
-    vec3  groundLight  = vec3(0.6, 0.3, 0.1);                   
-    float hemiMix      = remap(normal.y, -1.0, 1.0, 0.0, 1.0);  
-    vec3  hemiLight    = mix(groundLight, skyLight, hemiMix);   
+    /*  
+        - Since we are doing our lighting in world space, we need to get a hold of the world
+          space view direction. That is, the direction from the current fragment to the camera.
+        - We can compute the view direction by subtracting the world position (vPosition)
+          from the camera position (uCameraPosition), and then normalizing the result.
+    */
+
+    vec3 viewDirection = normalize(uCameraPosition - vPosition);
 
     vec3  ambientLight = vec3(0.5);                       
 
+    vec3  skyLight     = vec3(0.0, 0.3, 0.6);                   
+    vec3  groundLight  = vec3(0.3, 0.6, 0.1);                   
+    float hemiMix      = remap(normal.y, -1.0, 1.0, 0.0, 1.0);  
+    vec3  hemiLight    = mix(groundLight, skyLight, hemiMix);   
+
     vec3  lightDirection = normalize(vec3(1.0, 1.0, 1.0));
-    float dp             = max(dot(normal, lightDirection), 0.0);
+    float dp             = max(0.0, dot(normal, lightDirection));
     vec3  sunlightColor  = vec3(1.0, 1.0, 0.9);
     vec3  sunlight       = sunlightColor * dp;
 
+    // Phong Specular
+    vec3 r = normalize(reflect(-lightDirection, normal));
+    float phongValue = max(dot(r, viewDirection), 0.0);
+    phongValue = pow(phongValue, 32.0);
+
+    vec3 specular = vec3(phongValue);
+
     lighting += ambientLight * 0.0 + hemiLight * 0.5 + sunlight * 0.5;                 
 
-    vec3  color          = textureColor.rgb + lighting;
-
-    /*  
-        - We need to convert the final color into sRGB, 
-          with either the linear to sRGB conversion function 
-          or the pow(1.0 / 2.2) approximation.
-    */      
+    vec3  color          = textureColor.rgb * 0.2 + lighting + specular;   
 
     //color                = linearTosRGB(color);       // linear to sRGB conversion
     color                = pow(color, vec3(1.0 / 2.2)); // pow(1.0 / 2.2) approximation

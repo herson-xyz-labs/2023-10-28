@@ -1,13 +1,12 @@
 precision mediump float;
 
-uniform vec3 uColor;
 uniform sampler2D uTexture;
-
-uniform vec3 uCameraPosition;
+uniform samplerCube specMap;
 
 varying vec2 vUv;
 varying vec3 vNormal;
 varying vec3 vPosition;
+varying vec3 vCameraPosition;
 
 float inverseLerp(float v, float minValue, float maxValue) {
   return (v - minValue) / (maxValue - minValue);
@@ -34,14 +33,7 @@ void main() {
     vec3 lighting      = vec3(0.0);
     vec3 normal        = normalize(vNormal);
 
-    /*  
-        - Since we are doing our lighting in world space, we need to get a hold of the world
-          space view direction. That is, the direction from the current fragment to the camera.
-        - We can compute the view direction by subtracting the world position (vPosition)
-          from the camera position (uCameraPosition), and then normalizing the result.
-    */
-
-    vec3 viewDirection = normalize(uCameraPosition - vPosition);
+    vec3 viewDirection = normalize(vCameraPosition - vPosition);
 
     vec3  ambientLight = vec3(0.5);                       
 
@@ -61,6 +53,18 @@ void main() {
     phongValue = pow(phongValue, 32.0);
 
     vec3 specular = vec3(phongValue);
+
+    /*  
+        - We need to reflect around the normal
+        - We call reflect on the negative view direction and the normal, then normalize the result
+        - Sample from the cubemap
+    */
+
+    // IBL Specular
+    vec3 iblCoord = normalize(reflect(-viewDirection, normal));
+    vec3 iblSample = textureCube(specMap, iblCoord).rgb;
+
+    specular += iblSample * 0.5;
 
     lighting += ambientLight * 0.0 + hemiLight * 0.5 + sunlight * 0.5;                 
 

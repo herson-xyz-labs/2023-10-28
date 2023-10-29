@@ -16,6 +16,19 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// Cubemap
+const cubeTextureLoader = new THREE.CubeTextureLoader()
+const texture = cubeTextureLoader.load([
+    '/cubemap/px.png',
+    '/cubemap/nx.png',
+    '/cubemap/py.png',
+    '/cubemap/ny.png',
+    '/cubemap/pz.png',
+    '/cubemap/nz.png'
+])
+
+scene.background = texture
+
 /**
  * Textures
  */
@@ -43,15 +56,10 @@ const material = new THREE.RawShaderMaterial({
     fragmentShader: fragmentShader,
     uniforms: 
     {
-        uFrequency: { value: new THREE.Vector2(10, 5) },
-        uTime: { value: 0 },
-        uColor: { value: new THREE.Color('orange') },
-        uTexture: { value: linesTexture }
+        uTexture: { value: linesTexture },
+        specMap: { value: scene.background }
     }
 })
-
-gui.add(material.uniforms.uFrequency.value, 'x').min(0).max(20).step(0.01).name('frequencyX')
-gui.add(material.uniforms.uFrequency.value, 'y').min(0).max(20).step(0.01).name('frequencyY')
 
 // Mesh
 const mesh = new THREE.Mesh(geometry, material)
@@ -92,19 +100,6 @@ scene.add(camera)
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
-// Cubemap
-const cubeTextureLoader = new THREE.CubeTextureLoader()
-const texture = cubeTextureLoader.load([
-    '/cubemap/px.png',
-    '/cubemap/nx.png',
-    '/cubemap/py.png',
-    '/cubemap/ny.png',
-    '/cubemap/pz.png',
-    '/cubemap/nz.png'
-])
-
-scene.background = texture
-
 /**
  * Renderer
  */
@@ -122,9 +117,6 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
-
-    // Update material
-    material.uniforms.uTime.value = elapsedTime
 
     // Update controls
     controls.update()
